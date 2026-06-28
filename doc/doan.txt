@@ -1,0 +1,183 @@
+ 
+
+ 
+TRƯỜNG ĐẠI HỌC THUỶ LỢI
+KHOA CÔNG NGHỆ THÔNG TIN
+
+
+
+
+
+
+
+
+
+
+
+BẢN TÓM TẮT ĐỀ CƯƠNG ĐỒ ÁN TỐT NGHIỆP
+ 
+
+Tên đề tài: Hệ thống đặt lịch khám và đặt dịch vụ y tế trực tuyến tích hợp AI Gemini.
+         	
+Sinh viên thực hiện: Trần Danh Đạt
+Lớp: 64HTTT4
+Mã sinh viên: 2251161971
+Số điện thoại: 0961630273
+Email: datsteam2k4@gmail.com
+Giáo viên hướng dẫn: TS.Phạm Huy Thông                	  Email: thongph@haui.edu.vn
+
+                             
+ 
+
+
+
+
+TÓM TẮT ĐỀ TÀI
+Bối cảnh
+	Hiện nay chuyển đổi số đang diễn ra mạnh mẽ trong lĩnh vực y tế, nhu cầu áp dụng công nghệ thông tin vào quản lý phòng khám tư nhân ngày càng quan trọng hơn. Tại Việt Nam, số lượng phòng khám tư nhân tăng mạnh trong những năm gần đây, kéo theo áp lực lớn về quản lý lịch khám, hồ sơ bệnh nhân và chất lượng phục vụ. Người bệnh ngày càng có xu hướng tìm kiếm thông tin và đặt lịch khám trực tuyến thay vì đến trực tiếp, đòi hỏi các cơ sở y tế phải thích ứng nhanh.	
+Vấn đề
+Nhiều phòng khám tư nhân hiện nay vẫn quản lý lịch khám và hồ sơ bệnh nhân bằng phương pháp thủ công hoặc các hệ thống rời rạc, gây khó khăn trong việc theo dõi lịch hẹn, quản lý thông tin bệnh nhân và tối ưu quy trình khám chữa bệnh. Điều này dẫn đến tình trạng quá tải, sai sót trong quản lý và giảm trải nghiệm của người bệnh.
+Giải pháp		
+	Đề tài xây dựng hệ thống quản lý phòng khám trên nền tảng ASP.NET Core MVC, gồm các thành phần chính:
+Web đặt lịch khám trực tuyến: hỗ trợ bệnh nhân chọn chuyên khoa, bác sĩ, khung giờ hoặc đặt gói khám/dịch vụ phù hợp với yêu cầu, xác nhận/hủy/đổi lịch.
+Quản lý hồ sơ và khám bệnh: bác sĩ quản lý lịch làm việc, xác nhận lịch hẹn, ghi kết quả khám, kê đơn thuốc; bệnh nhân xem hồ sơ, kết quả khám và đánh giá bác sĩ.
+Hệ thống bài viết sức khỏe: bác sĩ/admin đăng bài, bệnh nhân đọc và tìm kiếm theo chuyên khoa.
+Chatbot AI Gemini: hỗ trợ hỏi đáp thông tin bác sĩ, dịch vụ và đặt lịch trực tuyến.
+Email nhắc lịch hẹn tự động gửi tới bệnh nhân và bác sĩ.
+Dashboard admin: quản lý tài khoản, bác sĩ, chuyên khoa, phòng khám, bài viết và thống kê lịch hẹn.
+
+
+ 	
+ 
+
+
+CÁC MỤC TIÊU CHÍNH
+Xây dựng website có 3 vai trò: bệnh nhân, bác sĩ, admin trên ASP.NET Core MVC, hỗ trợ quy trình đặt lịch khám bệnh trực tuyến.
+Chức năng đặt lịch: bệnh nhân chọn khoa, bác sĩ, khung giờ trống hoặc đặt gói khám/dịch vụ riêng biệt,, xác nhận/hủy/đổi lịch, theo dõi trạng thái và nhận nhắc nhở qua email.
+Quy trình quản lý khám bệnh của bác sĩ: quản lý lịch làm việc và khung giờ, xác nhận hoặc từ chối lịch hẹn, xem hồ sơ bệnh nhân (tiền sử bệnh, dị ứng thuốc), ghi kết quả khám và kê đơn thuốc.
+Hệ thống bài viết sức khỏe: bác sĩ/admin đăng bài, bệnh nhân đọc và tìm kiếm theo chủ đề/chuyên khoa.
+Dashboard admin: quản lý danh mục bác sĩ/khoa/phòng, quản lý tài khoản người dùng, duyệt bài viết, thống kê lịch hẹn theo ngày/tuần/tháng, tỷ lệ hủy lịch, bác sĩ nổi bật.
+Chatbot Gemini AI: hỗ trợ hỏi đáp thông tin bác sĩ, dịch vụ và đặt lịch trong khung chat.
+Quản lý hồ sơ bệnh nhân: xem lịch sử khám, kết quả khám, đơn thuốc cũ và đánh giá bác sĩ sau khám.
+Hệ thống realtime: bác sĩ nhận thông báo khi có lịch hẹn mới, bệnh nhân nhận thông báo khi lịch được xác nhận hoặc từ chối.
+NỘI DUNG CHÍNH
+Chương 1: Giới thiệu tổng quan
+Lý do chọn đề tài, bối cảnh, vấn đề và giải pháp đề xuất
+Mục tiêu của hệ thống, giới hạn và phạm vi nghiên cứu
+Kết quả dự kiến đạt được
+Chương 2: Kiến thức nền tảng
+Cơ sở lý thuyết về quản lý phòng khám, thiết kế phần mềm và cơ sở dữ liệu
+Ngôn ngữ lập trình và các công cụ sử dụng trong đề tài
+Mô hình MVC và kiến trúc hệ thống
+Chương 3: Phân tích và thiết kế hệ thống
+Khảo sát hệ thống tương tự, phân tích yêu cầu người dùng
+Thiết kế cơ sở dữ liệu (ERD) và các bảng quan trọng
+Thiết kế các module chức năng chính:
+Đặt lịch khám bệnh trực tuyến: chọn chuyên khoa, bác sĩ, khung giờ hoặc đặt gói khám/dịch vụ
+Quản lý hồ sơ bệnh nhân, kết quả khám, đơn thuốc, đánh giá bác sĩ
+Bác sĩ đăng nhập và xem lịch khám đã xác nhận.
+Sau khi khám, bác sĩ ghi kết quả, kê đơn thuốc vào hồ sơ bệnh nhân.
+Hệ thống lưu kết quả và cập nhật cho bệnh nhân.
+Bệnh nhân đăng nhập, xem kết quả khám.
+Bệnh nhân đánh giá bác sĩ, hệ thống ghi nhận đánh giá để thống kê.
+Hệ thống bài viết sức khỏe và quản lý nội dung theo chuyên khoa
+Bác sĩ/admin đăng nhập vào hệ thống quản lý bài viết.
+Tạo bài viết mới, chọn chuyên khoa và nội dung.
+Admin duyệt bài.
+Bệnh nhân truy cập, tìm kiếm bài viết theo chuyên khoa hoặc chủ đề.
+Bài viết được lưu và thống kê lượt xem trong dashboard admin.
+Chatbot AI Gemini hỗ trợ hỏi đáp thông tin phòng khám, dịch vụ, và đặt lịch trực tuyến
+Bệnh nhân mở cửa sổ chat trên website.
+Gửi câu hỏi về bác sĩ, dịch vụ hoặc đặt lịch.
+Chatbot phân tích câu hỏi, tra cứu dữ liệu thực tế.
+Trả lời thông tin chi tiết hoặc hướng dẫn đặt lịch trực tuyến.
+Nếu đặt lịch qua chatbot, hệ thống tạo lịch và gửi email xác nhận tự động.
+Email nhắc lịch hẹn tự động cho bệnh nhân và bác sĩ
+Hệ thống kiểm tra lịch hẹn sắp tới.
+Tự động gửi email nhắc nhở bệnh nhân và bác sĩ trước giờ khám 
+Cập nhật trạng thái email đã gửi trong dashboard.
+Dashboard admin quản lý tài khoản, bác sĩ, chuyên khoa, phòng khám, lịch hẹn, bài viết, và thống kê
+Admin đăng nhập vào dashboard.
+Quản lý danh mục bác sĩ, chuyên khoa, gói dịch vụ, phòng khám.
+Duyệt bài viết sức khỏe của bác sĩ.
+Xem thống kê: lịch hẹn theo ngày/tuần/tháng, tỷ lệ hủy lịch, bác sĩ nổi bật.
+Cập nhật, sửa hoặc xóa dữ liệu nếu cần.
+Thiết kế giao diện cho ba vai trò: bệnh nhân, bác sĩ, admin
+Chương 4: Xây dựng chương trình
+Thu thập dữ liệu và xây dựng cơ sở dữ liệu
+Lập trình các module chức năng chính
+Kiểm thử hệ thống, sửa lỗi và đánh giá hiệu quả
+Kết luận và hướng phát triển
+Tổng kết kết quả đạt được, hạn chế của hệ thống
+Định hướng phát triển trong tương lai
+
+
+
+ 
+ 
+KẾT QUẢ DỰ KIẾN
+Website chạy ổn định với ba vai trò, toàn bộ quy trình từ đặt lịch đến ghi kết quả khám và đánh giá bác sĩ hoạt động hoàn chỉnh.
+Chatbot Gemini AI trả lời được các câu hỏi thực tế về phòng khám và hỗ trợ bệnh nhân đặt lịch ngay trong cửa sổ chat.
+Email nhắc lịch hẹn tự động được gửi đến bệnh nhân và bác sĩ trước giờ khám.
+Hệ thống bài viết sức khỏe hoạt động với đầy đủ chức năng đăng bài, duyệt bài và tìm kiếm theo chuyên khoa.
+Dashboard admin hiển thị được thống kê lịch hẹn và quản lý toàn bộ dữ liệu phòng khám.
+Hoàn thành báo cáo đồ án và chuẩn bị demo để bảo vệ trước hội đồng.
+ 
+
+
+
+
+
+
+
+
+
+TIẾN ĐỘ THỰC HIỆN	
+ 
+TT
+Thời gian
+Nội dung công việc
+Kết quả dự kiến đạt được
+1 
+Tuần 1-2 
+Khảo sát hệ thống tương tự, phân tích yêu cầu, thiết kế cơ sở dữ liệu, vẽ ERD và use-case
+Tài liệu phân tích, ERD, use-case hoàn chỉnh
+2
+Tuần 3-4
+Lập trình backend: đăng ký, đăng nhập, phân quyền 3 vai trò, quản lý bác sĩ, chuyên khoa, lịch làm việc và khung giờ khám
+Xác thực, phân quyền, quản lý bác sĩ hoạt động
+3
+Tuần 5-6
+Lập trình backend: chức năng đặt lịch khám (chọn bác sĩ, khung giờ, gói khám/dịch vụ), hủy/đổi lịch, xem trạng thái lịch hẹn, đặt gói dịch vụ
+Hoàn chỉnh chức năng đặt lịch, hồ sơ, kết quả khám, đặt dịch vụ 
+4
+Tuần 7
+Lập trình backend: quản lý hồ sơ bệnh nhân, kết quả khám, đơn thuốc, đánh giá bác sĩ
+Hồ sơ, kết quả khám và đánh giá bác sĩ hoàn chỉnh
+5
+Tuần 8
+Lập trình backend: email nhắc lịch tự động, thống kê lịch hẹn cơ bản, quản lý tài khoản người dùng
+Email nhắc lịch hoạt động, thống kê cơ bản và quản lý user hoạt động
+6
+Tuần 9-10
+Lập trình frontend: giao diện bệnh nhân, bác sĩ, admin với chức năng cốt lõi
+Hoàn chỉnh giao diện cơ bản, đầy đủ chức năng đặt lịch, hồ sơ, dashboard
+7
+Tuần 11
+Tích hợp Chatbot Gemini AI cơ bản: trả lời thông tin bác sĩ, dịch vụ, hỗ trợ đặt lịch
+Chatbot hoạt động cơ bản, hỗ trợ hỏi đáp và đặt lịch
+8
+Tuần 12
+Kiểm thử chức năng toàn hệ thống, sửa lỗi, tối ưu giao diện
+Hệ thống ổn định, chạy mượt, lỗi chính đã fix
+9
+Tuần 13
+Hoàn thiện báo cáo đồ án, nộp đồ án
+Báo cáo hoàn chỉnh
+
+
+ 
+ 
+ 
+ 
+

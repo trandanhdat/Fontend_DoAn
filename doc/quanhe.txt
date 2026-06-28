@@ -1,0 +1,47 @@
+# DANH SÁCH CÁC MỐI QUAN HỆ GIỮA CÁC BẢNG (MODELS) TRONG DỰ ÁN
+
+Dưới đây là mô tả chi tiết bằng lời về các mối quan hệ (Relationships) giữa các bảng trong cơ sở dữ liệu dựa trên cấu trúc các Model của backend:
+
+## 1. Người dùng (ApplicationUser)
+Bảng `ApplicationUser` là bảng trung tâm lưu thông tin tài khoản, có mối quan hệ với rất nhiều bảng khác:
+- **ApplicationUser - Doctor (1-1):** Một tài khoản có thể liên kết với một hồ sơ Bác sĩ.
+- **ApplicationUser - Patient (1-1):** Một tài khoản có thể liên kết với một hồ sơ Bệnh nhân.
+- **ApplicationUser - Article (1-N):** Một người dùng (như admin/bác sĩ) có thể là tác giả của nhiều Bài viết (`AuthoredArticles`). Một người dùng cũng có thể là người duyệt của nhiều Bài viết (`ReviewedArticles`).
+- **ApplicationUser - ArticleView (1-N):** Một người dùng có thể xem nhiều Bài viết (lưu lại lịch sử xem).
+- **ApplicationUser - Notification (1-N):** Một người dùng có thể nhận nhiều Thông báo.
+- **ApplicationUser - EmailLog (1-N):** Hệ thống lưu lại nhiều log gửi email cho một người dùng.
+- **ApplicationUser - ChatbotLog (1-N):** Một người dùng có thể có nhiều lịch sử chat với Chatbot.
+- **ApplicationUser - RefreshToken (1-N):** Một người dùng có thể sở hữu nhiều phiên đăng nhập (refresh token).
+
+## 2. Bác sĩ (Doctor), Lịch làm việc & Chuyên khoa
+- **Specialty - Doctor (1-N):** Một Chuyên khoa có nhiều Bác sĩ làm việc, một Bác sĩ thuộc về một Chuyên khoa.
+- **Doctor - DoctorSchedule (1-N):** Một Bác sĩ có thể cấu hình nhiều Lịch làm việc tổng quát (theo các ngày trong tuần).
+- **DoctorSchedule - TimeSlot (1-N):** Một Lịch làm việc cụ thể được chia thành nhiều Khung giờ khám (TimeSlot).
+- **Doctor - TimeSlot (1-N):** Bác sĩ sở hữu nhiều Khung giờ khám bệnh.
+
+## 3. Bệnh nhân (Patient)
+- **Patient - Appointment (1-N):** Một Bệnh nhân có thể đặt nhiều Cuộc hẹn khám bệnh.
+- **Patient - MedicalRecord (1-N):** Một Bệnh nhân có thể có nhiều Hồ sơ bệnh án trong hệ thống.
+- **Patient - Review (1-N):** Một Bệnh nhân có thể viết nhiều Đánh giá cho các bác sĩ khác nhau.
+
+## 4. Chuyên khoa (Specialty) & Dịch vụ (Service)
+- **Specialty - Service (1-N):** Một Chuyên khoa cung cấp nhiều Dịch vụ y tế khác nhau (ví dụ: Khoa mắt cung cấp dịch vụ Đo thị lực, Khám đáy mắt,...).
+- **Specialty - Article (1-N):** Một Chuyên khoa có thể là danh mục (category) cho nhiều Bài viết y khoa.
+
+## 5. Cuộc hẹn khám bệnh (Appointment) - Bảng trung tâm của quy trình khám
+Bảng `Appointment` là trung tâm liên kết rất nhiều thực thể lại với nhau:
+- **Patient - Appointment (1-N):** Cuộc hẹn thuộc về một Bệnh nhân.
+- **Doctor - Appointment (1-N):** Cuộc hẹn được phân công cho một Bác sĩ.
+- **TimeSlot - Appointment (1-N):** Cuộc hẹn chiếm một Khung giờ nhất định.
+- **Service - Appointment (1-N):** Cuộc hẹn sử dụng một Dịch vụ y tế.
+- **Specialty - Appointment (1-N):** Cuộc hẹn đăng ký khám theo một Chuyên khoa.
+- **Appointment - MedicalRecord (1-1):** Sau khi khám xong, một Cuộc hẹn sẽ sinh ra một Hồ sơ bệnh án duy nhất.
+- **Appointment - Review (1-1):** Sau khi hoàn thành khám, bệnh nhân có thể để lại một Đánh giá cho cuộc hẹn đó.
+
+## 6. Bài viết tin tức (Article)
+- **Article - ArticleView (1-N):** Một bài viết có nhiều lượt xem, được lưu trữ chi tiết IP, UserAgent trong bảng `ArticleView`.
+
+## Tóm tắt luồng dữ liệu chính:
+`ApplicationUser` đăng nhập -> nếu là `Patient` -> Đặt `Appointment` -> Chọn `Specialty` -> Chọn `Service` -> Chọn `Doctor` -> Chọn `TimeSlot` trống của Bác sĩ đó.
+Khi đến khám, `Doctor` mở `Appointment` -> Điền kết quả -> Lưu thành `MedicalRecord`.
+Sau khám, `Patient` mở `Appointment` cũ -> Viết `Review` cho Bác sĩ.

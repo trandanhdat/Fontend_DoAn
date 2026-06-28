@@ -1,0 +1,224 @@
+// ===================================================
+// CLINIC MANAGEMENT SYSTEM - DBML for dbdiagram.io
+// ===================================================
+
+Table ApplicationUser {
+  Id int [pk, increment]
+  UserName varchar
+  Email varchar
+  PasswordHash varchar
+  FullName varchar
+  Phone varchar
+  AvatarUrl varchar
+  Status varchar
+  EmailVerifiedAt datetime
+  VerificationToken varchar
+  LastLoginAt datetime
+  CreatedAt datetime
+  UpdatedAt datetime
+}
+
+Table ApplicationRole {
+  Id int [pk, increment]
+  Name varchar
+  Description varchar
+  CreatedAt datetime
+  UpdatedAt datetime
+}
+
+Table Doctor {
+  Id int [pk, increment]
+  UserId int [ref: - ApplicationUser.Id]
+  SpecialtyId int [ref: > Specialty.Id]
+  LicenseNumber varchar
+  YearsExperience smallint
+  Degree varchar
+  Bio text
+  ConsultationFee decimal
+  AvgRating decimal
+  TotalReviews int
+  IsActive bool
+  CreatedAt datetime
+}
+
+Table Patient {
+  Id int [pk, increment]
+  UserId int [ref: - ApplicationUser.Id]
+  DateOfBirth date
+  Gender varchar
+  BloodType varchar
+  Allergies text
+  ChronicDiseases text
+  EmergencyContactName varchar
+  EmergencyContactPhone varchar
+  Address varchar
+  CreatedAt datetime
+}
+
+Table Specialty {
+  Id int [pk, increment]
+  Name varchar
+  Description text
+  IconUrl varchar
+  IsActive bool
+  CreatedAt datetime
+}
+
+Table Service {
+  Id int [pk, increment]
+  SpecialtyId int [ref: > Specialty.Id]
+  Name varchar
+  Description text
+  Price decimal
+  DurationMinutes int
+  IsActive bool
+  CreatedAt datetime
+}
+
+Table DoctorSchedule {
+  Id int [pk, increment]
+  DoctorId int [ref: > Doctor.Id]
+  DayOfWeek tinyint [note: '0=Sun, 1=Mon, ..., 6=Sat']
+  StartTime time
+  EndTime time
+  SlotDurationMinutes int
+  IsActive bool
+  EffectiveFrom date
+  EffectiveTo date
+}
+
+Table TimeSlot {
+  Id int [pk, increment]
+  DoctorId int [ref: > Doctor.Id]
+  ScheduleId int [ref: > DoctorSchedule.Id]
+  SlotDate date
+  StartTime time
+  EndTime time
+  Status varchar [note: 'Available | Booked | Blocked']
+  CreatedAt datetime
+}
+
+Table Appointment {
+  Id int [pk, increment]
+  PatientId int [ref: > Patient.Id]
+  DoctorId int [ref: > Doctor.Id]
+  TimeSlotId int [ref: > TimeSlot.Id]
+  ServiceId int [ref: > Service.Id]
+  SpecialtyId int [ref: > Specialty.Id]
+  AppointmentDate date
+  StartTime time
+  Reason text
+  Status varchar [note: 'Pending | Confirmed | Completed | Cancelled']
+  CancelledBy int [ref: > ApplicationUser.Id]
+  CancelReason text
+  CancelledAt datetime
+  ConfirmedAt datetime
+  CompletedAt datetime
+  CheckInTime datetime
+  Fee decimal
+  Notes text
+  CreatedAt datetime
+  UpdatedAt datetime
+}
+
+Table MedicalRecord {
+  Id int [pk, increment]
+  AppointmentId int [ref: - Appointment.Id]
+  PatientId int [ref: > Patient.Id]
+  DoctorId int [ref: > Doctor.Id]
+  Diagnosis text
+  Symptoms text
+  Treatment text
+  Notes text
+  FollowUpDate date
+  Attachments text
+  CreatedAt datetime
+  UpdatedAt datetime
+}
+
+Table Review {
+  Id int [pk, increment]
+  AppointmentId int [ref: - Appointment.Id]
+  PatientId int [ref: > Patient.Id]
+  DoctorId int [ref: > Doctor.Id]
+  Rating tinyint [note: '1-5']
+  Comment text
+  IsVisible bool
+  EditCount int
+  CreatedAt datetime
+  UpdatedAt datetime
+}
+
+Table Article {
+  Id int [pk, increment]
+  AuthorId int [ref: > ApplicationUser.Id]
+  SpecialtyId int [ref: > Specialty.Id]
+  Title varchar
+  Slug varchar
+  Summary text
+  Content text
+  ThumbnailUrl varchar
+  Status varchar [note: 'Draft | Published | Archived']
+  PublishedAt datetime
+  ReviewedBy int [ref: > ApplicationUser.Id]
+  ViewCount int
+  CreatedAt datetime
+  UpdatedAt datetime
+}
+
+Table ArticleView {
+  Id int [pk, increment]
+  ArticleId int [ref: > Article.Id]
+  UserId int [ref: > ApplicationUser.Id]
+  IpAddress varchar
+  UserAgent varchar
+  ViewedAt datetime
+}
+
+Table ChatbotLog {
+  Id int [pk, increment]
+  SessionId varchar
+  UserId int [ref: > ApplicationUser.Id]
+  Message text
+  Response text
+  Intent varchar
+  Entities text
+  CreatedAt datetime
+}
+
+Table EmailLog {
+  Id int [pk, increment]
+  UserId int [ref: > ApplicationUser.Id]
+  EmailTo varchar
+  Type varchar
+  Subject varchar
+  Body text
+  Status varchar [note: 'Pending | Sent | Failed']
+  SentAt datetime
+  ErrorMessage text
+  ReferenceId int
+  ReferenceType varchar
+  CreatedAt datetime
+}
+
+Table Notification {
+  Id int [pk, increment]
+  UserId int [ref: > ApplicationUser.Id]
+  Type varchar
+  Title varchar
+  Message text
+  Data text
+  IsRead bool
+  ReadAt datetime
+  CreatedAt datetime
+}
+
+Table RefreshToken {
+  Id int [pk, increment]
+  UserId int [ref: > ApplicationUser.Id]
+  Token varchar
+  ExpiresAt datetime
+  CreatedAt datetime
+  IsRevoked bool
+  ReplacedByToken varchar
+}
