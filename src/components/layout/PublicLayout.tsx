@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
-import { Search, Bell, User } from "lucide-react";
+import { Search, Bell, User, Menu, X } from "lucide-react";
 import { useAuthStore } from "../../store/auth.store";
 import { NotificationBell } from "./NotificationBell";
 
@@ -8,6 +8,11 @@ export const PublicLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, user, clearAuth } = useAuthStore();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  React.useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-800 font-sans">
@@ -105,8 +110,42 @@ export const PublicLayout: React.FC = () => {
                 Đăng nhập
               </Link>
             )}
+
+            {/* Mobile Menu Button */}
+            <button 
+              className="md:hidden p-2 -mr-2 text-slate-600 hover:text-slate-900 focus:outline-none"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-100 bg-white shadow-md">
+            <nav className="flex flex-col px-4 py-3 space-y-2">
+              <Link 
+                to="/" 
+                className={`px-3 py-2 rounded-lg font-medium transition-colors ${location.pathname === '/' ? 'bg-blue-50 text-[#1b8eb7]' : 'text-slate-600 hover:bg-slate-50'}`}
+              >
+                Trang chủ
+              </Link>
+              <Link 
+                to="/doctors" 
+                className={`px-3 py-2 rounded-lg font-medium transition-colors ${location.pathname.startsWith('/doctors') ? 'bg-blue-50 text-[#1b8eb7]' : 'text-slate-600 hover:bg-slate-50'}`}
+              >
+                Bác sĩ
+              </Link>
+              <Link 
+                to="/articles" 
+                className={`px-3 py-2 rounded-lg font-medium transition-colors ${location.pathname.startsWith('/articles') ? 'bg-blue-50 text-[#1b8eb7]' : 'text-slate-600 hover:bg-slate-50'}`}
+              >
+                Tin tức
+              </Link>
+            </nav>
+          </div>
+        )}
       </header>
 
       {/* Main Content */}

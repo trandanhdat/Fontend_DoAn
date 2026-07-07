@@ -105,8 +105,14 @@ export const BookAppointmentPage: React.FC = () => {
       });
       toast.success('Đặt lịch khám thành công!');
       navigate('/patient/records');
-    } catch (error) {
-      toast.error('Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.');
+    } catch (error: any) {
+      const msg = error.response?.data?.message;
+      if (msg && msg.includes("Khung giờ này vừa có người khác đặt")) {
+        toast.error(msg);
+        setCurrentStep(3); // Quay lại bước chọn thời gian
+      } else {
+        toast.error(msg || 'Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.');
+      }
     } finally {
       setIsSubmitting(false);
     }
