@@ -48,12 +48,16 @@ export const ChatbotWidget: React.FC = () => {
   // Ref để lưu trữ instance của SpeechRecognition
   const recognitionRef = useRef<any>(null);
 
+  const prevUserIdRef = useRef(user?.id);
+
   // Lưu lịch sử chat mỗi khi có thay đổi
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify({ messages, sessionId }));
-  }, [messages, sessionId, storageKey]);
-
-  const prevUserIdRef = useRef(user?.id);
+    // Chỉ lưu nếu user hiện tại khớp với user lúc tải/tạo tin nhắn
+    // Việc này ngăn chặn việc lưu đè tin nhắn của user cũ sang user mới khi vừa chuyển tài khoản
+    if (prevUserIdRef.current === user?.id) {
+      localStorage.setItem(storageKey, JSON.stringify({ messages, sessionId }));
+    }
+  }, [messages, sessionId, storageKey, user?.id]);
 
   // Tải lại hoặc reset lịch sử chat khi chuyển đổi tài khoản
   useEffect(() => {
@@ -298,17 +302,7 @@ export const ChatbotWidget: React.FC = () => {
 
           {/* Footer (Khu vực nhập text) */}
           <div className="p-3 bg-white border-t border-gray-100 flex items-center space-x-2 shrink-0">
-            <button
-              onClick={toggleListening}
-              className={`p-2 rounded-full transition-colors flex items-center justify-center w-10 h-10 ${
-                isListening 
-                  ? 'bg-red-100 text-red-600 animate-pulse' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-              title="Nhập bằng giọng nói"
-            >
-              {isListening ? <MicOff size={18} /> : <Mic size={18} />}
-            </button>
+
             <input
               type="text"
               value={input}

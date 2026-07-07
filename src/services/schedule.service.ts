@@ -28,6 +28,9 @@ export const scheduleService = {
     const response = await axiosInstance.post<DoctorScheduleDto>('/DoctorSchedule', dto);
     return response.data;
   },
+  delete: async (scheduleId: number): Promise<void> => {
+    await axiosInstance.delete(`/DoctorSchedule/${scheduleId}`);
+  },
   blockSlot: async (slotId: number): Promise<void> => {
     await axiosInstance.patch(`/doctorschedule/slots/${slotId}/block`);
   },

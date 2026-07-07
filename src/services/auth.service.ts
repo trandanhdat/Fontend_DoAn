@@ -32,10 +32,16 @@ export const authService = {
   getMe: async (token?: string): Promise<UserProfile> => {
     const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
     const response = await axiosInstance.get<UserProfile>("/auth/me", config);
-    if (response.data && response.data.roles) {
-      response.data.roles = response.data.roles.map((r: string) =>
-        (r.charAt(0).toUpperCase() + r.slice(1).toLowerCase()) as any
-      );
+    if (response.data) {
+      // Backend returns userId (string), frontend expects id (number)
+      if ((response.data as any).userId) {
+        response.data.id = Number((response.data as any).userId);
+      }
+      if (response.data.roles) {
+        response.data.roles = response.data.roles.map((r: string) =>
+          (r.charAt(0).toUpperCase() + r.slice(1).toLowerCase()) as any
+        );
+      }
     }
     // Parse doctorId / patientId từ JWT claims
     const activeToken = token ?? axiosInstance.defaults.headers.common?.["Authorization"]?.toString().replace("Bearer ", "");

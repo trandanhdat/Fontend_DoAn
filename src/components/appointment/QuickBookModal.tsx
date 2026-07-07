@@ -51,20 +51,21 @@ export const QuickBookModal: React.FC<QuickBookModalProps> = ({ doctorId, isOpen
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Generate đúng 5 ngày làm việc (T2-T6) bắt đầu từ hôm nay
+    // Generate 5 ngày kế tiếp có lịch làm việc của bác sĩ
     let addedDays = 0;
     let dayOffset = 0;
 
-    while (addedDays < 5) {
+    // Giới hạn tìm kiếm tối đa 30 ngày để tránh infinite loop
+    while (addedDays < 5 && dayOffset < 30) {
       const currentDate = new Date(today);
       currentDate.setDate(today.getDate() + dayOffset);
 
       const dayOfWeek = currentDate.getDay(); // 0 là CN, 1-5 là T2-T6, 6 là T7
 
-      // Bỏ qua Thứ 7 và Chủ Nhật
-      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-        const matchingSchedules = schedules.filter(s => s.dayOfWeek === dayOfWeek);
+      const matchingSchedules = schedules.filter(s => s.dayOfWeek === dayOfWeek);
 
+      // Nếu bác sĩ CÓ lịch vào ngày này (bất kể T7, CN hay ngày thường)
+      if (matchingSchedules.length > 0) {
         for (const schedule of matchingSchedules) {
           const [startH, startM] = schedule.startTime.split(':').map(Number);
           const [endH, endM] = schedule.endTime.split(':').map(Number);
@@ -134,7 +135,14 @@ export const QuickBookModal: React.FC<QuickBookModalProps> = ({ doctorId, isOpen
   const totalFee = (doctor?.consultationFee || 0) + (selectedService?.price || 0);
 
   const timeSlots = useMemo(() => {
-    return allSlots.filter(s => s.slotDate === selectedDate);
+    const todayStr = format(new Date(), "yyyy-MM-dd");
+    const currentTimeStr = format(new Date(), "HH:mm:ss");
+    
+    return allSlots.filter(s => {
+      if (s.slotDate !== selectedDate) return false;
+      if (selectedDate === todayStr && s.startTime < currentTimeStr) return false;
+      return true;
+    });
   }, [allSlots, selectedDate]);
 
   const morningSlots = timeSlots.filter(s => {

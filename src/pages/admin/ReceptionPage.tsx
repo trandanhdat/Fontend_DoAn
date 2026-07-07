@@ -140,10 +140,18 @@ export const ReceptionPage: React.FC = () => {
                   </td>
                 </tr>
               ) : (
-                filteredAppts.map((appt) => (
-                  <tr key={appt.id} className="hover:bg-slate-50 transition-colors">
+                filteredAppts.map((appt) => {
+                  const isToday = selectedDate === format(new Date(), "yyyy-MM-dd");
+                  const currentTimeStr = format(new Date(), "HH:mm");
+                  const isLate = isToday && appt.status === "Confirmed" && fmtTime(appt.startTime) < currentTimeStr;
+
+                  return (
+                  <tr key={appt.id} className={`transition-colors ${isLate ? 'bg-red-50/50 hover:bg-red-50' : 'hover:bg-slate-50'}`}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-semibold text-slate-700">{fmtTime(appt.startTime)}</div>
+                      <div className={`font-semibold ${isLate ? 'text-red-600' : 'text-slate-700'}`}>
+                        {fmtTime(appt.startTime)}
+                        {isLate && <span className="ml-2 text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded border border-red-200">Trễ hẹn</span>}
+                      </div>
                       <div className="text-xs text-slate-500">{fmtTime(appt.endTime)}</div>
                     </td>
                     <td className="px-6 py-4">
@@ -231,7 +239,8 @@ export const ReceptionPage: React.FC = () => {
                       )}
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>

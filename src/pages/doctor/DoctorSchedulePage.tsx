@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { format, startOfWeek, addDays, addWeeks, subWeeks, isSameDay } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Lock, Unlock, CalendarDays } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lock, Unlock, CalendarDays, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -26,7 +26,7 @@ import {
 
 import {
     useDoctorSchedules, useTimeSlotsByDate,
-    useCreateSchedule, useBlockSlot, useUnblockSlot
+    useCreateSchedule, useBlockSlot, useUnblockSlot, useDeleteSchedule
 } from '../../hooks/useDoctorSchedule';
 import { useAuthStore } from '../../store/auth.store';
 import type { DoctorScheduleDto, TimeSlotDto } from '../../models/api.model';
@@ -221,6 +221,7 @@ export default function DoctorSchedulePage() {
     const { data: slots = [], isLoading: loadingSlots } = useTimeSlotsByDate(doctorId, selectedDateStr);
 
     const createMutation = useCreateSchedule();
+    const deleteMutation = useDeleteSchedule();
     const blockMutation = useBlockSlot(doctorId ?? 0, selectedDateStr);
     const unblockMutation = useUnblockSlot(doctorId ?? 0, selectedDateStr);
 
@@ -228,12 +229,17 @@ export default function DoctorSchedulePage() {
     const form = useForm<ScheduleFormValues>({
         resolver: zodResolver(scheduleSchema),
         defaultValues: {
-            dayOfWeek: 1,
+            dayOfWeek: selectedDay.getDay(),
             startTime: '08:00',
             endTime: '17:00',
             slotDurationMinutes: 30,
         },
     });
+
+    // Đồng bộ Ngày đang chọn trên Header xuống Form Ngày trong tuần
+    useEffect(() => {
+        form.setValue('dayOfWeek', selectedDay.getDay());
+    }, [selectedDay, form]);
 
     const onSubmit = (values: ScheduleFormValues) => {
         if (!doctorId) return;
@@ -316,85 +322,117 @@ export default function DoctorSchedulePage() {
                     <CardHeader className="pb-2 px-5 pt-4">
                         <CardTitle className="text-sm font-semibold text-slate-700">Cấu hình lịch</CardTitle>
                     </CardHeader>
-                    <CardContent className="px-5 pb-5">
-                        <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <CardContent className="px-5 pb-5 space-y-5">
 
-                                {/* Ngày trong tuần */}
-                                <FormField control={form.control} name="dayOfWeek" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-xs text-slate-600">Ngày trong tuần</FormLabel>
-                                        <Select onValueChange={(v) => field.onChange(Number(v))} value={String(field.value)}>
-                                            <FormControl>
-                                                <SelectTrigger className="h-9 text-sm">
-                                                    <SelectValue placeholder="Chọn thứ" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {DAY_FULL.map((label, idx) => (
-                                                    <SelectItem key={idx} value={String(idx)}>{label}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage className="text-xs" />
-                                    </FormItem>
-                                )} />
-
-                                {/* Giờ bắt đầu / kết thúc */}
-                                <div className="grid grid-cols-2 gap-3">
-                                    <FormField control={form.control} name="startTime" render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-xs text-slate-600">Giờ bắt đầu</FormLabel>
-                                            <FormControl>
-                                                <Input type="time" className="h-9 text-sm" {...field} />
-                                            </FormControl>
-                                            <FormMessage className="text-xs" />
-                                        </FormItem>
-                                    )} />
-                                    <FormField control={form.control} name="endTime" render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-xs text-slate-600">Giờ kết thúc</FormLabel>
-                                            <FormControl>
-                                                <Input type="time" className="h-9 text-sm" {...field} />
-                                            </FormControl>
-                                            <FormMessage className="text-xs" />
-                                        </FormItem>
-                                    )} />
-                                </div>
-
-                                {/* Thời lượng slot */}
-                                <FormField control={form.control} name="slotDurationMinutes" render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-xs text-slate-600">Thời lượng slot (phút)</FormLabel>
-                                        <div className="flex gap-2">
-                                            {[15, 30, 45, 60].map((min) => (
-                                                <button
-                                                    key={min} type="button"
-                                                    onClick={() => field.onChange(min)}
-                                                    className={[
-                                                        'flex-1 h-9 rounded-lg border text-sm font-medium transition-all',
-                                                        field.value === min
-                                                            ? 'bg-[#2E86AB] text-white border-[#2E86AB]'
-                                                            : 'bg-white text-slate-600 border-slate-200 hover:border-[#2E86AB] hover:text-[#2E86AB]',
-                                                    ].join(' ')}
-                                                >
-                                                    {min}
-                                                </button>
-                                            ))}
+                        {/* Danh sách các ca đã cấu hình */}
+                        {schedules.filter(s => s.dayOfWeek === form.watch('dayOfWeek')).length > 0 && (
+                            <div className="space-y-2">
+                                <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Các ca làm việc hiện tại</h4>
+                                <div className="space-y-2">
+                                    {schedules.filter(s => s.dayOfWeek === form.watch('dayOfWeek')).map(s => (
+                                        <div key={s.id} className="flex items-center justify-between p-2.5 rounded-lg border border-slate-100 bg-slate-50">
+                                            <div className="text-sm font-medium text-slate-700">
+                                                {s.startTime.slice(0, 5)} – {s.endTime.slice(0, 5)} <span className="text-xs text-slate-400 font-normal ml-1">({s.slotDurationMinutes} phút/slot)</span>
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-7 w-7 text-red-400 hover:text-red-600 hover:bg-red-50"
+                                                onClick={() => {
+                                                    if (confirm('Bạn có chắc muốn xóa ca làm việc này không? Các slot trống sẽ bị xóa, slot đã có khách đặt sẽ được giữ lại.')) {
+                                                        deleteMutation.mutate({ scheduleId: s.id, doctorId });
+                                                    }
+                                                }}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
                                         </div>
-                                        <FormMessage className="text-xs" />
-                                    </FormItem>
-                                )} />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
-                                <Button
-                                    type="submit"
-                                    className="w-full bg-[#2E86AB] hover:bg-[#256d8c] h-9"
-                                    disabled={createMutation.isPending}
-                                >
-                                    {createMutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
-                                </Button>
-                            </form>
-                        </Form>
+                        <div className="pt-2 border-t border-slate-100">
+                            <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Thêm ca làm việc mới</h4>
+                            <Form {...form}>
+                                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+
+                                    {/* Ngày trong tuần */}
+                                    <FormField control={form.control} name="dayOfWeek" render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-xs text-slate-600">Ngày trong tuần</FormLabel>
+                                            <Select onValueChange={(v) => field.onChange(Number(v))} value={String(field.value)}>
+                                                <FormControl>
+                                                    <SelectTrigger className="h-9 text-sm">
+                                                        <SelectValue placeholder="Chọn thứ" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {DAY_FULL.map((label, idx) => (
+                                                        <SelectItem key={idx} value={String(idx)}>{label}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage className="text-xs" />
+                                        </FormItem>
+                                    )} />
+
+                                    {/* Giờ bắt đầu / kết thúc */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <FormField control={form.control} name="startTime" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs text-slate-600">Giờ bắt đầu</FormLabel>
+                                                <FormControl>
+                                                    <Input type="time" className="h-9 text-sm" {...field} />
+                                                </FormControl>
+                                                <FormMessage className="text-xs" />
+                                            </FormItem>
+                                        )} />
+                                        <FormField control={form.control} name="endTime" render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs text-slate-600">Giờ kết thúc</FormLabel>
+                                                <FormControl>
+                                                    <Input type="time" className="h-9 text-sm" {...field} />
+                                                </FormControl>
+                                                <FormMessage className="text-xs" />
+                                            </FormItem>
+                                        )} />
+                                    </div>
+
+                                    {/* Thời lượng slot */}
+                                    <FormField control={form.control} name="slotDurationMinutes" render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-xs text-slate-600">Thời lượng slot (phút)</FormLabel>
+                                            <div className="flex gap-2">
+                                                {[15, 30, 45, 60].map((min) => (
+                                                    <button
+                                                        key={min} type="button"
+                                                        onClick={() => field.onChange(min)}
+                                                        className={[
+                                                            'flex-1 h-9 rounded-lg border text-sm font-medium transition-all',
+                                                            field.value === min
+                                                                ? 'bg-[#2E86AB] text-white border-[#2E86AB]'
+                                                                : 'bg-white text-slate-600 border-slate-200 hover:border-[#2E86AB] hover:text-[#2E86AB]',
+                                                        ].join(' ')}
+                                                    >
+                                                        {min}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            <FormMessage className="text-xs" />
+                                        </FormItem>
+                                    )} />
+
+                                    <Button
+                                        type="submit"
+                                        className="w-full bg-[#2E86AB] hover:bg-[#256d8c] h-9"
+                                        disabled={createMutation.isPending}
+                                    >
+                                        {createMutation.isPending ? 'Đang thêm...' : 'Thêm ca làm việc mới'}
+                                    </Button>
+                                </form>
+                            </Form>
+                        </div>
                     </CardContent>
                 </Card>
 
@@ -451,13 +489,13 @@ export default function DoctorSchedulePage() {
             <AlertDialog open={!!blockTarget} onOpenChange={(o) => !o && setBlockTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Xác nhận khóa khung giờ</AlertDialogTitle>
-                        <AlertDialogDescription>
+                        <AlertDialogTitle className="text-slate-800 text-xl">Xác nhận khóa khung giờ</AlertDialogTitle>
+                        <AlertDialogDescription className="text-slate-600 text-base mt-2">
                             Bạn muốn khóa slot{' '}
-                            <span className="font-semibold text-slate-700">
+                            <span className="font-semibold text-slate-800">
                                 {blockTarget?.startTime.slice(0, 5)} – {blockTarget?.endTime.slice(0, 5)}
                             </span>{' '}
-                            ngày <span className="font-semibold text-slate-700">{format(selectedDay, 'dd/MM/yyyy')}</span>?
+                            ngày <span className="font-semibold text-slate-800">{format(selectedDay, 'dd/MM/yyyy')}</span>?
                             Slot sẽ không thể đặt lịch sau khi khóa.
                         </AlertDialogDescription>
                     </AlertDialogHeader>

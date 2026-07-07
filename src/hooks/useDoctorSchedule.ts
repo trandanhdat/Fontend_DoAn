@@ -37,7 +37,23 @@ export function useCreateSchedule() {
             toast.success('Lưu lịch làm việc thành công!');
             qc.invalidateQueries({ queryKey: SCHEDULE_KEYS.byDoctor(vars.doctorId) });
         },
-        onError: (err) => toast.error(`Lưu thất bại: ${err.message}`),
+        onError: (err: any) => {
+            const backendMsg = err.response?.data?.message || err.message;
+            toast.error(`Lưu thất bại: ${backendMsg}`);
+        },
+    });
+}
+
+/** Mutation: Xóa một ca làm việc */
+export function useDeleteSchedule() {
+    const qc = useQueryClient();
+    return useMutation<void, Error, { scheduleId: number, doctorId: number }>({
+        mutationFn: ({ scheduleId }) => scheduleService.delete(scheduleId),
+        onSuccess: (_data, vars) => {
+            toast.success('Đã xóa ca làm việc!');
+            qc.invalidateQueries({ queryKey: SCHEDULE_KEYS.byDoctor(vars.doctorId) });
+        },
+        onError: (err) => toast.error(`Xóa thất bại: ${err.message}`),
     });
 }
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -33,10 +33,17 @@ export const HomePage: React.FC = () => {
   // Lấy top 8 chuyên khoa
   const displaySpecialties = specialties.slice(0, 8);
 
-  // Lấy top 4 bác sĩ (giả lập sort theo rating, fallback nếu api k sort sẵn)
-  const displayDoctors = [...doctors]
-    .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
-    .slice(0, 4);
+  // Bác sĩ tiêu biểu (Carousel state)
+  const [docIndex, setDocIndex] = useState(0);
+
+  const topDoctors = [...doctors]
+    .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
+
+  const maxDocIndex = Math.max(0, topDoctors.length - 4);
+  const displayDoctors = topDoctors.slice(docIndex, docIndex + 4);
+
+  const handlePrevDoctor = () => setDocIndex(prev => Math.max(0, prev - 1));
+  const handleNextDoctor = () => setDocIndex(prev => Math.min(maxDocIndex, prev + 1));
 
   // Ánh xạ icon tạm thời cho chuyên khoa nếu backend chỉ trả string iconUrl hoặc null
   const getIconForSpecialty = (name: string) => {
@@ -131,10 +138,18 @@ export const HomePage: React.FC = () => {
               <p className="text-slate-500">Đội ngũ chuyên gia giàu kinh nghiệm luôn sẵn sàng</p>
             </div>
             <div className="flex gap-2">
-              <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center bg-white hover:bg-slate-50 text-slate-400">
+              <button 
+                onClick={handlePrevDoctor}
+                disabled={docIndex === 0}
+                className={`w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center transition-colors ${docIndex === 0 ? 'bg-slate-50 text-slate-300 cursor-not-allowed' : 'bg-white hover:bg-slate-50 text-slate-600'}`}
+              >
                 <ChevronLeft className="w-5 h-5" />
               </button>
-              <button className="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center bg-white hover:bg-slate-50 text-slate-600">
+              <button 
+                onClick={handleNextDoctor}
+                disabled={docIndex >= maxDocIndex}
+                className={`w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center transition-colors ${docIndex >= maxDocIndex ? 'bg-slate-50 text-slate-300 cursor-not-allowed' : 'bg-white hover:bg-slate-50 text-slate-600'}`}
+              >
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
