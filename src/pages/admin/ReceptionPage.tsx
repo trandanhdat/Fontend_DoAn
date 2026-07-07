@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 import { appointmentService } from "../../services/appointment.service";
-import { useCheckIn, useMarkNoShow } from "../../hooks/useDoctorAppointments";
-import { CancelModal, RescheduleModal, AssignDoctorModal } from "./ReceptionModals";
+import { useMarkNoShow } from "../../hooks/useDoctorAppointments";
+import { CancelModal, RescheduleModal, AssignDoctorModal, CheckInModal } from "./ReceptionModals";
 import type { AppointmentDto } from "../../models/api.model";
 
 const fmtTime = (t: string) => (t ?? "").slice(0, 5);
@@ -22,6 +22,7 @@ export const ReceptionPage: React.FC = () => {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [assignDoctorOpen, setAssignDoctorOpen] = useState(false);
+  const [checkInOpen, setCheckInOpen] = useState(false);
 
   const { data: appointments = [], isLoading } = useQuery({
     queryKey: ["allTodayAppointments", selectedDate],
@@ -29,7 +30,6 @@ export const ReceptionPage: React.FC = () => {
     refetchInterval: 10_000, // Tự động refetch để cập nhật liên tục
   });
 
-  const checkInMutation = useCheckIn();
   const noShowMutation = useMarkNoShow();
 
   const filteredAppts = appointments.filter((appt) =>
@@ -194,10 +194,9 @@ export const ReceptionPage: React.FC = () => {
                             Lỡ hẹn
                           </Button>
                           <Button
-                            onClick={() => checkInMutation.mutate(appt.id)}
-                            disabled={checkInMutation.isPending}
+                            onClick={() => { setSelectedAppt(appt); setCheckInOpen(true); }}
                             className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-                            title="Xác nhận đã đến"
+                            title="Xác nhận đã đến & Thu tiền"
                           >
                             Đã đến
                           </Button>
@@ -249,6 +248,7 @@ export const ReceptionPage: React.FC = () => {
       <CancelModal appt={selectedAppt} isOpen={cancelOpen} onClose={() => setCancelOpen(false)} />
       <RescheduleModal appt={selectedAppt} isOpen={rescheduleOpen} onClose={() => setRescheduleOpen(false)} />
       <AssignDoctorModal appt={selectedAppt} isOpen={assignDoctorOpen} onClose={() => setAssignDoctorOpen(false)} />
+      <CheckInModal appt={selectedAppt} isOpen={checkInOpen} onClose={() => setCheckInOpen(false)} />
     </div>
   );
 };

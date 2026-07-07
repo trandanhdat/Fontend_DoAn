@@ -200,6 +200,7 @@ export interface AppointmentDto {
   endTime?: string;
   checkInTime?: string;
   status: string;
+  paymentStatus: string;
   fee?: number;
   reason?: string;
 }

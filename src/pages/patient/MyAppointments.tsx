@@ -133,6 +133,15 @@ export const MyAppointments: React.FC = () => {
                       apt.status === 'Pending' ? '• Chờ xác nhận' :
                         apt.status === 'Completed' ? '• Hoàn thành' : '• Đã hủy'}
                   </span>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium ${
+                    apt.paymentStatus === 'Paid' ? 'bg-emerald-50 text-emerald-600' :
+                    apt.paymentStatus === 'Failed' ? 'bg-red-50 text-red-600' :
+                    'bg-slate-100 text-slate-600'
+                  }`}>
+                    {apt.paymentStatus === 'Paid' ? '💳 Đã đặt cọc' :
+                     apt.paymentStatus === 'Failed' ? '💳 Thanh toán lỗi' :
+                     '💳 Chưa thanh toán'}
+                  </span>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-600">
                   <div className="flex items-center gap-1.5">

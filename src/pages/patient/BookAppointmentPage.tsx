@@ -10,6 +10,7 @@ import { TimeSelectionStep } from '../../components/appointment/book-steps/TimeS
 import { ConfirmStep } from '../../components/appointment/book-steps/ConfirmStep';
 
 import { appointmentService } from '../../services/appointment.service';
+import { paymentService } from '../../services/payment.service';
 import { useAuthStore } from '../../store/auth.store';
 
 export interface AppointmentFormValues {
@@ -93,7 +94,7 @@ export const BookAppointmentPage: React.FC = () => {
 
     try {
       setIsSubmitting(true);
-      await appointmentService.bookAppointment({
+      const appointment = await appointmentService.bookAppointment({
         patientId: user.patientId!,
         doctorId: data.doctorId!,
         timeSlotId: data.timeSlotId!,
@@ -103,9 +104,12 @@ export const BookAppointmentPage: React.FC = () => {
         reason: data.reason.trim() || undefined,
         notes: data.notes.trim() || undefined
       });
-      toast.success('Đặt lịch khám thành công!');
-      navigate('/patient/records');
+      
+      toast.loading('Đang chuyển hướng sang cổng thanh toán VNPAY...', { id: 'vnpay' });
+      const url = await paymentService.createPaymentUrl(appointment.id);
+      window.location.href = url; // Chuyển hướng sang VNPAY
     } catch (error: any) {
+      toast.dismiss('vnpay');
       const msg = error.response?.data?.message;
       if (msg && msg.includes("Khung giờ này vừa có người khác đặt")) {
         toast.error(msg);

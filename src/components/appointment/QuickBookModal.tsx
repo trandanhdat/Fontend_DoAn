@@ -8,6 +8,7 @@ import { scheduleService } from "../../services/schedule.service";
 import { serviceService } from "../../services/service.service";
 import { doctorService } from "../../services/doctor.service";
 import { appointmentService } from "../../services/appointment.service";
+import { paymentService } from "../../services/payment.service";
 import { useAuthStore } from "../../store/auth.store";
 
 interface QuickBookModalProps {
@@ -157,11 +158,11 @@ export const QuickBookModal: React.FC<QuickBookModalProps> = ({ doctorId, isOpen
   });
 
   const bookMutation = useMutation({
-    mutationFn: (timeSlotId: number) => {
+    mutationFn: async (timeSlotId: number) => {
       const patientId = user?.patientId || 0; // Sử dụng ID của patient đang đăng nhập  
       const selectedSlotObj = allSlots.find(s => s.id === timeSlotId);
 
-      return appointmentService.bookAppointment({
+      const appointment = await appointmentService.bookAppointment({
         patientId,
         doctorId,
         timeSlotId,
@@ -171,13 +172,16 @@ export const QuickBookModal: React.FC<QuickBookModalProps> = ({ doctorId, isOpen
         reason: reason.trim() || undefined,
         notes: notes.trim() || undefined
       });
+      
+      return appointment;
     },
-    onSuccess: () => {
-      toast.success("Đặt lịch khám thành công!");
-      onSuccess();
-      onClose();
+    onSuccess: async (appointment) => {
+      toast.loading("Đang chuyển hướng sang cổng thanh toán VNPAY...", { id: 'vnpay' });
+      const url = await paymentService.createPaymentUrl(appointment.id);
+      window.location.href = url;
     },
     onError: (error: any) => {
+      toast.dismiss('vnpay');
       const msg = error.response?.data?.message;
       if (msg && msg.includes("Khung giờ này vừa có người khác đặt")) {
         toast.error(msg);

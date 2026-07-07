@@ -6,10 +6,69 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-import { useCancelAppointment, useRescheduleAppointment, useAssignDoctor } from '../../hooks/useDoctorAppointments';
+import { useCancelAppointment, useRescheduleAppointment, useAssignDoctor, useCheckIn } from '../../hooks/useDoctorAppointments';
 import { scheduleService } from '../../services/schedule.service';
 import { doctorService } from '../../services/doctor.service';
 import type { AppointmentDto } from '../../models/api.model';
+
+// ─── Check-In Modal ──────────────────────────────────────────────────────────
+export const CheckInModal = ({ appt, isOpen, onClose }: { appt: AppointmentDto | null, isOpen: boolean, onClose: () => void }) => {
+  const checkInMutation = useCheckIn();
+
+  const handleConfirm = () => {
+    if (!appt) return;
+    checkInMutation.mutate(appt.id, {
+      onSuccess: () => {
+        onClose();
+      }
+    });
+  };
+
+  const fee = appt?.fee || 0;
+  const deposit = appt?.paymentStatus === 'Paid' ? 100000 : 0;
+  const remaining = fee - deposit;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold text-slate-900">Xác nhận Check-in & Thu tiền</DialogTitle>
+          <DialogDescription className="text-base text-slate-700 mt-2">
+            Bệnh nhân <span className="font-bold text-slate-900">{appt?.patientName}</span> đã đến phòng khám. 
+            Vui lòng thu khoản phí còn lại trước khi cho bệnh nhân vào phòng khám.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-slate-600">Tổng phí khám (dự kiến):</span>
+              <span className="font-medium text-slate-800">{fee.toLocaleString('vi-VN')} VNĐ</span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-slate-600">Đã đặt cọc (VNPAY):</span>
+              <span className="font-medium text-emerald-600">-{deposit.toLocaleString('vi-VN')} VNĐ</span>
+            </div>
+            <div className="pt-3 border-t border-slate-200 flex justify-between items-center">
+              <span className="font-bold text-slate-800">Số tiền cần thu thêm:</span>
+              <span className="text-xl font-bold text-red-600">{remaining > 0 ? remaining.toLocaleString('vi-VN') : 0} VNĐ</span>
+            </div>
+          </div>
+          <p className="text-sm text-slate-500 italic">
+            * Nhấn Xác nhận đồng nghĩa với việc Lễ tân đã thu đủ số tiền <span className="font-bold text-slate-700">{remaining > 0 ? remaining.toLocaleString('vi-VN') : 0} VNĐ</span> từ bệnh nhân.
+          </p>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} disabled={checkInMutation.isPending}>Hủy</Button>
+          <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleConfirm} disabled={checkInMutation.isPending}>
+            {checkInMutation.isPending ? 'Đang xử lý...' : 'Xác nhận thu tiền & Check-in'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 // ─── Cancel Modal ────────────────────────────────────────────────────────
 export const CancelModal = ({ appt, isOpen, onClose }: { appt: AppointmentDto | null, isOpen: boolean, onClose: () => void }) => {

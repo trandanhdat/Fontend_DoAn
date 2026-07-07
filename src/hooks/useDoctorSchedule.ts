@@ -53,7 +53,10 @@ export function useDeleteSchedule() {
             toast.success('Đã xóa ca làm việc!');
             qc.invalidateQueries({ queryKey: SCHEDULE_KEYS.byDoctor(vars.doctorId) });
         },
-        onError: (err) => toast.error(`Xóa thất bại: ${err.message}`),
+        onError: (err: any) => {
+            const backendMsg = err.response?.data?.message || err.message;
+            toast.error(`Xóa thất bại: ${backendMsg}`);
+        },
     });
 }
 

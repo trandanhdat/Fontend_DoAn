@@ -1,73 +1,53 @@
-# React + TypeScript + Vite
+# 🏥 Med Clinical - Frontend (Hệ thống Quản lý Phòng Khám)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Đây là kho lưu trữ mã nguồn Frontend cho Hệ thống Quản lý Phòng Khám (Med Clinical) - Đồ án tốt nghiệp.
 
-Currently, two official plugins are available:
+## 🚀 Công nghệ sử dụng
+- **ReactJS (TypeScript)** với **Vite** (Build tool siêu tốc)
+- **Tailwind CSS** (Tùy biến Giao diện)
+- **React Router DOM** (Điều hướng trang)
+- **Zustand** (Quản lý State toàn cục cho Authentication)
+- **TanStack React Query** (Quản lý trạng thái fetching dữ liệu từ API)
+- **React Hook Form** (Quản lý biểu mẫu)
+- **Lucide React** (Bộ icon hiện đại)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Các tính năng chính
+- **Giao diện thân thiện (Responsive UI):** Giao diện tương thích trên cả máy tính và thiết bị di động (Mobile Menu).
+- **Luồng đặt lịch (Booking Flow):** Bệnh nhân có thể tìm kiếm bác sĩ, xem chi tiết và tiến hành đặt lịch thông qua các màn hình dạng Stepper (Từng bước).
+- **Xử lý mượt mà khi lỗi đặt lịch:** Tích hợp logic xử lý mã lỗi HTTP 400 từ Backend, tự động tải lại danh sách giờ rảnh nếu có người khác đặt trùng lịch.
+- **Tích hợp Chatbot AI:** Một Widget Chatbot nằm góc màn hình giúp người dùng tương tác với trợ lý ảo y tế.
+- **Trang Dashboard đa quyền hạn:** Giao diện thay đổi tự động tương ứng dựa theo vai trò đăng nhập: Bệnh nhân (Patient), Bác sĩ (Doctor), và Quản trị viên (Admin).
 
-## React Compiler
+## 🛠 Cách Cài đặt và Chạy dự án
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Clone dự án về máy:**
+   ```bash
+   git clone <url-repository>
+   cd clinic-management
+   ```
 
-## Expanding the ESLint configuration
+2. **Cài đặt các gói thư viện (Dependencies):**
+   ```bash
+   npm install
+   # hoặc dùng yarn: yarn install
+   ```
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+3. **Cấu hình Biến môi trường:**
+   Đảm bảo cấu hình đường dẫn API trỏ về Backend ASP.NET Core của bạn (Thông thường tại `http://localhost:5000` hoặc tương tự).
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+4. **Chạy dự án trên máy phát triển (Dev Server):**
+   ```bash
+   npm run dev
+   ```
+   *Mở trình duyệt và truy cập vào link (thường là `http://localhost:5173`).*
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+5. **Build cho môi trường Production:**
+   ```bash
+   npm run build
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 📈 Kiến trúc thư mục (Gitflow)
+Dự án được quản lý theo mô hình **Gitflow Workflow**:
+- `main` / `master`: Nhánh chứa code hoàn thiện, dùng để release.
+- `develop`: Nhánh gom các tính năng chuẩn bị release.
+- `feature/*`: Các nhánh con dùng để phát triển các tính năng riêng lẻ (VD: `feature/optimistic-concurrency-booking`).

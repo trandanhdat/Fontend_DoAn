@@ -28,6 +28,7 @@ import { PatientDashboardPage } from "../pages/patient/PatientDashboardPage";
 import { AppointmentDetailPage } from "../pages/patient/AppointmentDetailPage";
 import { MedicalHistoryPage } from "../pages/patient/MedicalHistoryPage";
 import { BookAppointmentPage } from "../pages/patient/BookAppointmentPage";
+import { PaymentResultPage } from "../pages/patient/PaymentResultPage";
 import { MyAppointments } from "../pages/patient/MyAppointments";
 import DoctorAppointmentsPage from "@/pages/doctor/DoctorAppointmentsPage";
 import DoctorDashboardPage from "@/pages/doctor/DoctorDashboardPage";
@@ -64,6 +65,7 @@ export const AppRouter: React.FC = () => {
           <Route path="/doctors/:id" element={<DoctorDetailPage />} />
           <Route path="/book-general" element={<GeneralBookingPage />} />
           <Route path="/book-doctor" element={<BookAppointmentPage />} />
+          <Route path="/payment-result" element={<PaymentResultPage />} />
         </Route>
 
 

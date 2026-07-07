@@ -53,6 +53,10 @@ export const AppointmentDetailPage: React.FC = () => {
               <h1 className="text-2xl font-bold text-slate-800">Chi tiết lịch hẹn #{appointment.id}</h1>
               <p className="text-sm text-slate-500 mt-1">
                 Trạng thái: <span className={`font-semibold ${appointment.status === 'Completed' ? 'text-emerald-600' : 'text-amber-600'}`}>{appointment.status}</span>
+                <span className="mx-2 text-slate-300">•</span>
+                Thanh toán: <span className={`font-semibold ${appointment.paymentStatus === 'Paid' ? 'text-emerald-600' : appointment.paymentStatus === 'Failed' ? 'text-red-600' : 'text-slate-600'}`}>
+                  {appointment.paymentStatus === 'Paid' ? 'Đã đặt cọc' : appointment.paymentStatus === 'Failed' ? 'Thất bại' : 'Chưa thanh toán'}
+                </span>
               </p>
             </div>
             {appointment.status === 'Completed' && <CheckCircle2 className="w-8 h-8 text-emerald-500" />}
