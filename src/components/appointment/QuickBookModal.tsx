@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { Loader2, X, Clock } from "lucide-react";
@@ -19,6 +19,7 @@ interface QuickBookModalProps {
 
 export const QuickBookModal: React.FC<QuickBookModalProps> = ({ doctorId, isOpen, onClose, onSuccess }) => {
   const { isAuthenticated, user } = useAuthStore();
+  const queryClient = useQueryClient();
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [selectedTimeSlotId, setSelectedTimeSlotId] = useState<number | null>(null);
   const [reason, setReason] = useState<string>("");
@@ -176,8 +177,15 @@ export const QuickBookModal: React.FC<QuickBookModalProps> = ({ doctorId, isOpen
       onSuccess();
       onClose();
     },
-    onError: () => {
-      toast.error("Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.");
+    onError: (error: any) => {
+      const msg = error.response?.data?.message;
+      if (msg && msg.includes("Khung giờ này vừa có người khác đặt")) {
+        toast.error(msg);
+        queryClient.invalidateQueries({ queryKey: ['realTimeslots', doctorId, selectedDate] });
+        setSelectedTimeSlotId(null);
+      } else {
+        toast.error(msg || "Có lỗi xảy ra khi đặt lịch. Vui lòng thử lại.");
+      }
     }
   });
 
